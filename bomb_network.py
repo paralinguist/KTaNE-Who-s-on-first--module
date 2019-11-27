@@ -33,6 +33,8 @@ def query(ip, request):
       response = server.recv(4096).decode()
     except:
       response = "No connection to server."
+      server.close()
+      server = socket.socket()
   return response
 
 def decode_leds(code):
@@ -56,7 +58,7 @@ class BombServer:
     result = query(self.ip, 'register' + module_id)
     try:
       if 'Error' in result:
-        print(result)
+        #print(result)
         result = False
       else:
         result = int(result)

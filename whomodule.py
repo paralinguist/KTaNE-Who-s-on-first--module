@@ -178,28 +178,31 @@ def draw_background():
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 timer = 0
 
-#TODO: This absolutely hammers the server with requests - put a 1-3 second delay in?
+registered = bomb_server.register()
+status = bomb_server.get_status()
 while True:
-  registered = bomb_server.register()
-  status = bomb_server.get_status()
-  if registered and status == INITIALISING and disarmed:
-    disarmed = False
-  if registered and status == ACTIVE and not disarmed:
-    for event in pygame.event.get():
-      if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_ESCAPE:
-          quitgame()
-      if event.type == pygame.QUIT:
+  for event in pygame.event.get():
+    if event.type == pygame.KEYDOWN:
+      if event.key == pygame.K_ESCAPE:
         quitgame()
-      if event.type == pygame.MOUSEBUTTONUP:
+    if event.type == pygame.QUIT:
+      quitgame()
+    if event.type == pygame.MOUSEBUTTONUP:
+      if registered and status == ACTIVE and not disarmed and overdraw == '':
         if button_press != 0:
           do_thing(button_press)
           button_press = 0
-      if event.type == pygame.USEREVENT:
-        if timer <= 0:
-          overdraw = ''
-        else:
-          timer -= 1
+    if event.type == pygame.USEREVENT:
+      registered = bomb_server.register()
+      status = bomb_server.get_status()
+      if timer <= 0:
+        overdraw = ''
+      else:
+        timer -= 1
+
+  if registered and status == INITIALISING and disarmed:
+    disarmed = False
+  if registered and status == ACTIVE and not disarmed:
 
     draw_background()
 
